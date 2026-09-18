@@ -44,7 +44,7 @@ Then, every time:
 npm run dev
 ```
 
-That one command starts the local database (its data lives in `.pgdata/`), applies any database changes, and runs the API and the app. Leave it running and open http://localhost:5173. Sign in as either person with the passwords in `.env` (`change-me` and `change-me-too` until you change them). Press Ctrl+C in that terminal to stop everything.
+That one command starts the local database (its data lives in `.pgdata/`), applies any database changes, and runs the API and the app. Leave it running and open http://localhost:5173. Sign in as either person with the passwords in `.env` (`290126` for both until you change them). Press Ctrl+C in that terminal to stop everything.
 
 To try both sides at once, use a second browser or a private window for the other person. To use it from your phone on the same Wi-Fi, open the "Network" address the app prints.
 
@@ -65,7 +65,7 @@ To try both sides at once, use a second browser or a private window for the othe
 4. On the app service, set these variables:
    - `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`
    - `NODE_ENV` = `production`
-   - `PRINCIPESSA_PASSWORD` and `PRINCIPE_PASSWORD`: long passwords
+   - `PRINCIPESSA_PASSWORD` and `PRINCIPE_PASSWORD`: numeric codes (e.g. `290126`)
    - `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` for notifications (see below)
 5. Generate a public domain for the service under Settings → Networking.
 

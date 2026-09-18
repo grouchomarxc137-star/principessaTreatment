@@ -13,9 +13,6 @@ async function ensureUser(role: Role, name: string, password: string | undefined
     if (!existing) console.warn(`No ${role}_PASSWORD set, so ${name} can't sign in yet.`);
     return;
   }
-  if (password.length < 8 && env.isProd) {
-    console.warn(`${role}_PASSWORD is shorter than 8 characters. Choose a longer one.`);
-  }
   if (!existing) {
     await prisma.user.create({ data: { role, name, passwordHash: await hashPassword(password) } });
     console.log(`Created ${name}.`);

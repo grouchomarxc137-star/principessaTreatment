@@ -51,6 +51,8 @@ export function SignIn({ onSignedIn }: { onSignedIn: (me: Me) => void }) {
             id="password"
             className="input"
             type="password"
+            inputMode="numeric"
+            pattern="[0-9]*"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
