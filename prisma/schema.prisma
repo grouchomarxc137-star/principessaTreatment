@@ -1,0 +1,295 @@
+// Principessa Treatment — data model.
+// Two users, one relationship. Keep it readable.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../server/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  PRINCIPESSA
+  PRINCIPE
+}
+
+enum Mode {
+  DISTANCE
+  TOGETHER
+}
+
+// Which mode a card or mission belongs to. ANY shows in both.
+enum CardMode {
+  ANY
+  DISTANCE
+  TOGETHER
+}
+
+enum Feeling {
+  OVERWHELMED
+  LOW_ENERGY
+  NEEDY
+  UPSET
+  MISSING_HIM
+  OKAY
+  GOOD
+}
+
+// ---------------------------------------------------------------------------
+// People and sessions
+
+model User {
+  id                String             @id @default(cuid())
+  role              Role               @unique
+  name              String
+  passwordHash      String
+  createdAt         DateTime           @default(now())
+  sessions          Session[]
+  pushSubscriptions PushSubscription[]
+  media             Media[]
+}
+
+model Session {
+  // SHA-256 of the cookie token; the raw token never touches the database.
+  id         String   @id
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+  expiresAt  DateTime
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// What is true right now. Always exactly one row, id = 1.
+
+model CurrentState {
+  id           Int       @id @default(1)
+  feeling      Feeling?
+  feelingSince DateTime?
+  mode         Mode      @default(DISTANCE)
+  modeSince    DateTime  @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Care Deck
+
+model CareCard {
+  id          String         @id @default(cuid())
+  // In her voice, as it appears on the card: "Reassure me"
+  title       String
+  // How it reads when the app asks on her behalf: "some reassurance"
+  forHim      String
+  mode        CardMode       @default(ANY)
+  isCustom    Boolean        @default(false)
+  hidden      Boolean        @default(false)
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  requests    CareRequest[]
+  chosenIn    CareResponse[]
+  discoveries Discovery[]
+}
+
+// ---------------------------------------------------------------------------
+// Care requests: every way she asks for care lands here, so responses and
+// aftercare work the same for all of them.
+//
+//   CARD       picked from the Care Deck
+//   CANT_ASK   "I can't ask for it": the app asks on her behalf
+//   HANDLE_ME  "Permission to handle me": he decides what care to give
+//   SOS        one button, no details
+//   OFFER      she claimed one of his open offers
+//   MYSTERY    not asked for: he finished a secret mission, and this is how
+//              she finds out what it was (and can say whether it helped)
+
+enum RequestKind {
+  CARD
+  CANT_ASK
+  HANDLE_ME
+  SOS
+  OFFER
+  MYSTERY
+}
+
+enum RequestStatus {
+  OPEN
+  DONE
+  CANCELLED
+}
+
+model CareRequest {
+  id               String          @id @default(cuid())
+  kind             RequestKind
+  status           RequestStatus   @default(OPEN)
+  cardId           String?
+  card             CareCard?       @relation(fields: [cardId], references: [id], onDelete: SetNull)
+  offerId          String?         @unique
+  offer            OpenOffer?      @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  missionId        String?         @unique
+  mission          MysteryMission? @relation(fields: [missionId], references: [id], onDelete: SetNull)
+  // Snapshots of the moment she asked, used to learn what helps when.
+  feeling          Feeling?
+  mode             Mode
+  createdAt        DateTime        @default(now())
+  closedAt         DateTime?
+  // She chose "not now" on the aftercare prompt.
+  aftercareSkipped Boolean         @default(false)
+  responses        CareResponse[]
+  aftercare        Aftercare?
+
+  @@index([status, createdAt])
+}
+
+enum ResponseKind {
+  ON_IT // "I'm on it"
+  LITTLE_BIT // "Give me a little bit"
+  CANT_NOW // "I can't right now, but I'm here"
+}
+
+model CareResponse {
+  id           String       @id @default(cuid())
+  requestId    String
+  request      CareRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  kind         ResponseKind
+  // For HANDLE_ME: the care he decided on.
+  chosenCardId String?
+  chosenCard   CareCard?    @relation(fields: [chosenCardId], references: [id], onDelete: SetNull)
+  // Reserved for when he can answer with a photo, voice note or video.
+  mediaId      String?
+  media        Media?       @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  createdAt    DateTime     @default(now())
+
+  @@index([requestId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Aftercare and what it teaches. Both of them see her answers; only she
+// confirms discoveries. Never a score.
+
+enum Helped {
+  A_LOT
+  A_LITTLE
+  NOT_REALLY
+}
+
+model Aftercare {
+  id        String      @id @default(cuid())
+  requestId String      @unique
+  request   CareRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  helped    Helped
+  note      String?
+  createdAt DateTime    @default(now())
+}
+
+enum DiscoveryStatus {
+  SUGGESTED
+  CONFIRMED
+  DISMISSED
+}
+
+model Discovery {
+  id         String          @id @default(cuid())
+  // Identifies the pattern so a dismissed one is never suggested again,
+  // e.g. "OVERWHELMED:card:<id>" or "ANY:handle-me".
+  key        String          @unique
+  feeling    Feeling?
+  cardId     String?
+  card       CareCard?       @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  handleMe   Boolean         @default(false)
+  sampleSize Int
+  status     DiscoveryStatus @default(SUGGESTED)
+  createdAt  DateTime        @default(now())
+  decidedAt  DateTime?
+}
+
+// ---------------------------------------------------------------------------
+// Do / Don't: how she wants to be treated right now. An item is on while
+// activeSince is set and less than a day old.
+
+enum PreferenceKind {
+  DO
+  DONT
+}
+
+model Preference {
+  id          String         @id @default(cuid())
+  kind        PreferenceKind
+  text        String
+  isCustom    Boolean        @default(false)
+  activeSince DateTime?
+  sortOrder   Int            @default(0)
+  createdAt   DateTime       @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// His side
+
+enum OfferStatus {
+  OPEN
+  CLAIMED
+  WITHDRAWN
+}
+
+model OpenOffer {
+  id        String       @id @default(cuid())
+  text      String
+  status    OfferStatus  @default(OPEN)
+  createdAt DateTime     @default(now())
+  expiresAt DateTime
+  closedAt  DateTime?
+  request   CareRequest?
+
+  @@index([status, expiresAt])
+}
+
+enum MissionStatus {
+  ACTIVE
+  DONE
+  SKIPPED
+}
+
+// Secret until he's done it; then a MYSTERY request reveals it to her.
+model MysteryMission {
+  id        String        @id @default(cuid())
+  text      String
+  mode      Mode
+  status    MissionStatus @default(ACTIVE)
+  createdAt DateTime      @default(now())
+  closedAt  DateTime?
+  reveal    CareRequest?
+}
+
+// ---------------------------------------------------------------------------
+// Infrastructure for later: push notifications and media.
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+}
+
+enum MediaKind {
+  PHOTO
+  VOICE
+  VIDEO
+}
+
+// Metadata only. The bytes live in object storage under storageKey.
+model Media {
+  id           String         @id @default(cuid())
+  kind         MediaKind
+  storageKey   String         @unique
+  mimeType     String
+  sizeBytes    Int
+  uploadedById String
+  uploadedBy   User           @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  createdAt    DateTime       @default(now())
+  responses    CareResponse[]
+}
