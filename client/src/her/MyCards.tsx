@@ -10,7 +10,6 @@ export function MyCards() {
   const { act, say } = useStore();
   const [cards, setCards] = useState<CardView[] | null>(null);
   const [title, setTitle] = useState("");
-  const [forHim, setForHim] = useState("");
   const [mode, setMode] = useState<CardMode>("ANY");
 
   const load = () => api.get<CardView[]>("/her/cards").then(setCards);
@@ -20,10 +19,9 @@ export function MyCards() {
 
   const add = async (e: FormEvent) => {
     e.preventDefault();
-    const ok = await act(() => api.post("/her/cards", { title, forHim, mode }));
+    const ok = await act(() => api.post("/her/cards", { title, mode }));
     if (ok) {
       setTitle("");
-      setForHim("");
       say("Added to your deck.");
       load();
     }
@@ -56,18 +54,6 @@ export function MyCards() {
               />
             </div>
             <div className="field">
-              <label htmlFor="card-forhim">When the app asks for you: “she'd really like…”</label>
-              <input
-                id="card-forhim"
-                className="input"
-                maxLength={80}
-                placeholder="a back rub"
-                value={forHim}
-                onChange={(e) => setForHim(e.target.value)}
-                required
-              />
-            </div>
-            <div className="field">
               <span className="meta">Show it</span>
               <div className="segmented" role="group" aria-label="When to show it">
                 {(["ANY", "DISTANCE", "TOGETHER"] as const).map((m) => (
@@ -77,7 +63,7 @@ export function MyCards() {
                 ))}
               </div>
             </div>
-            <button type="submit" className="btn btn--primary" disabled={!title.trim() || !forHim.trim()}>
+            <button type="submit" className="btn btn--primary" disabled={!title.trim()}>
               Add to deck
             </button>
           </form>

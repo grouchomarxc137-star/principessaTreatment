@@ -25,7 +25,7 @@ export function HimApp() {
         tabs={[
           { to: "/", label: "Her", dot: path !== "/" && s.active.some((r) => !r.response) },
           { to: "/offer", label: "Offer" },
-          { to: "/mystery", label: "Mystery" },
+          { to: "/mystery", label: "Wishes" },
           { to: "/more", label: "More" },
         ]}
       />

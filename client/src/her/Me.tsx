@@ -16,6 +16,11 @@ export function Me() {
         <nav aria-label="More">
           <ul className="list">
             <li>
+              <Link to="/me/wishes" className="list-link">
+                Secret wishes
+              </Link>
+            </li>
+            <li>
               <Link to="/me/cards" className="list-link">
                 My cards
               </Link>

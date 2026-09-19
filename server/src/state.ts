@@ -65,7 +65,7 @@ export async function buildState(me: Me): Promise<AppState> {
   const isHer = me.role === "PRINCIPESSA";
   const now = new Date();
 
-  const [current, partner, active, pending, preferences, offers, discoveries, cards, mission] =
+  const [current, partner, active, pending, preferences, offers, discoveries, cards, mission, wishes] =
     await Promise.all([
       prisma.currentState.findUniqueOrThrow({ where: { id: 1 } }),
       prisma.user.findFirst({ where: { NOT: { id: me.id } }, select: { name: true } }),
@@ -104,6 +104,7 @@ export async function buildState(me: Me): Promise<AppState> {
       isHer
         ? null
         : prisma.mysteryMission.findFirst({ where: { status: "ACTIVE" }, orderBy: { createdAt: "desc" } }),
+      isHer ? [] : prisma.wish.findMany({ select: { mode: true } }),
     ]);
 
   const preferenceViews: PreferenceView[] = preferences
@@ -145,6 +146,7 @@ export async function buildState(me: Me): Promise<AppState> {
     discoveries: discoveryViews,
     cards: cards.map(toCardView),
     mission: mission ? { id: mission.id, text: mission.text, createdAt: mission.createdAt.toISOString() } : null,
+    wishesToDraw: wishes.filter((w) => w.mode === "ANY" || w.mode === current.mode).length,
     pushConfigured,
   };
 }

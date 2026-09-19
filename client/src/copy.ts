@@ -45,7 +45,10 @@ export function requestTitle(r: RequestView, side: "her" | "him" = "her"): strin
     case "OFFER":
       return r.offerText ?? "His offer";
     case "MYSTERY":
-      return side === "her" ? "His secret mission" : "Your secret mission";
+      return side === "her" ? "One of your wishes" : "Her secret wish";
+    case "CANT_ASK":
+      if (r.card) return r.card.title;
+      return side === "her" ? "I can't ask for it" : "Extra love, no questions";
     default:
       return r.card?.title ?? "A card you've since removed";
   }

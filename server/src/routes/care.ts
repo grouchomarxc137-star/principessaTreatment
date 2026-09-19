@@ -32,37 +32,23 @@ async function loadRequest(id: string) {
 
 // --- Asking -----------------------------------------------------------------
 
-const AskBody = z.object({
-  cardId: z.string().min(1),
-  // "I can't ask for it": the app asks on her behalf.
-  onMyBehalf: z.boolean().default(false),
-});
+const AskBody = z.object({ cardId: z.string().min(1) });
 
 careRoutes.post("/requests", async (req, res) => {
   requireRole(req, "PRINCIPESSA");
-  const { cardId, onMyBehalf } = parse(AskBody, req.body);
+  const { cardId } = parse(AskBody, req.body);
   const card = await prisma.careCard.findUnique({ where: { id: cardId } });
   if (!card || card.hidden) throw new HttpError(404, "That card isn't in the deck.");
 
-  const kind: RequestKind = onMyBehalf ? "CANT_ASK" : "CARD";
-  const existing = await findOpen(kind, card.id);
+  const existing = await findOpen("CARD", card.id);
   if (existing) return res.json(toRequestView(existing));
 
   const request = await prisma.careRequest.create({
-    data: { kind, cardId: card.id, ...(await snapshot()) },
+    data: { kind: "CARD", cardId: card.id, ...(await snapshot()) },
     include: requestInclude,
   });
   broadcastChange();
-  notifyLater(
-    "PRINCIPE",
-    onMyBehalf
-      ? {
-          title: "She couldn't ask for this herself",
-          body: `But she'd really like ${card.forHim}.`,
-          tag: `request-${request.id}`,
-        }
-      : { title: "Principessa is asking", body: `${card.title}.`, tag: `request-${request.id}` },
-  );
+  notifyLater("PRINCIPE", { title: "Principessa is asking", body: `${card.title}.`, tag: `request-${request.id}` });
   res.status(201).json(toRequestView(request));
 });
 
@@ -91,6 +77,22 @@ careRoutes.post("/handle-me", async (req, res) => {
   notifyLater("PRINCIPE", {
     title: "She's handed it to you",
     body: "Principessa doesn't want to decide. You choose how to take care of her.",
+    tag: `request-${request.id}`,
+  });
+  res.status(201).json(toRequestView(request));
+});
+
+// "I can't ask for it": a quiet signal with no card and no details. Older
+// CANT_ASK requests may still carry a card from when it went through the deck.
+careRoutes.post("/quiet", async (req, res) => {
+  requireRole(req, "PRINCIPESSA");
+  const request =
+    (await findOpen("CANT_ASK")) ??
+    (await prisma.careRequest.create({ data: { kind: "CANT_ASK", ...(await snapshot()) }, include: requestInclude }));
+  broadcastChange();
+  notifyLater("PRINCIPE", {
+    title: "She could use some extra love",
+    body: "Don't ask, just be sweet to her.",
     tag: `request-${request.id}`,
   });
   res.status(201).json(toRequestView(request));

@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { z } from "zod";
-import { MISSIONS_TO_REMEMBER, OFFER_HOURS, missionsFor } from "../catalog.ts";
+import { MISSIONS_TO_REMEMBER, OFFER_HOURS } from "../catalog.ts";
 import { prisma } from "../db.ts";
 import { HttpError, parse, requireRole } from "../http.ts";
 import { notifyLater } from "../notify.ts";
 import { broadcastChange } from "../realtime.ts";
 
-// His side: putting care on offer, and secret missions she only learns about
-// once he's done them.
+// His side: putting care on offer, and her secret wishes, which she only learns
+// he's granted once he's done them.
 
 export const principeRoutes = Router();
 
@@ -39,18 +39,19 @@ principeRoutes.post("/offers/:id/withdraw", async (req, res) => {
 
 // --- Mystery care -------------------------------------------------------------------
 
-// Draws a new mission for the current mode, avoiding recent ones. Any mission
-// he was still holding is set aside.
+// Draws one of her wishes for the current mode, avoiding recent ones. Any
+// wish he was still holding is set aside.
 principeRoutes.post("/mystery/draw", async (_req, res) => {
   const current = await prisma.currentState.findUniqueOrThrow({ where: { id: 1 } });
+  const options = await prisma.wish.findMany({ where: { mode: { in: ["ANY", current.mode] } } });
+  if (!options.length) throw new HttpError(409, "She hasn't written any wishes for right now yet.");
   const recent = await prisma.mysteryMission.findMany({
     orderBy: { createdAt: "desc" },
     take: MISSIONS_TO_REMEMBER,
-    select: { text: true },
+    select: { wishId: true },
   });
-  const seen = new Set(recent.map((m) => m.text));
-  const options = missionsFor(current.mode);
-  const fresh = options.filter((m) => !seen.has(m.text));
+  const seen = new Set(recent.map((m) => m.wishId));
+  const fresh = options.filter((w) => !seen.has(w.id));
   const pool = fresh.length ? fresh : options;
   const pick = pool[Math.floor(Math.random() * pool.length)];
 
@@ -58,7 +59,7 @@ principeRoutes.post("/mystery/draw", async (_req, res) => {
     where: { status: "ACTIVE" },
     data: { status: "SKIPPED", closedAt: new Date() },
   });
-  const mission = await prisma.mysteryMission.create({ data: { text: pick.text, mode: current.mode } });
+  const mission = await prisma.mysteryMission.create({ data: { text: pick.text, mode: current.mode, wishId: pick.id } });
   res.status(201).json({ id: mission.id, text: mission.text, createdAt: mission.createdAt.toISOString() });
 });
 
@@ -86,8 +87,8 @@ principeRoutes.post("/mystery/:id/done", async (req, res) => {
   ]);
   broadcastChange();
   notifyLater("PRINCIPESSA", {
-    title: "That was a secret mission",
-    body: "Principe was on a mystery mission for you. Open the app to see what it was.",
+    title: "He granted one of your wishes",
+    body: "Principe secretly did one of your wishes. Open the app to see which one.",
     tag: `mystery-${mission.id}`,
   });
   res.json({ ok: true });

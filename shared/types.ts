@@ -99,6 +99,12 @@ export interface DiscoveryView {
   sampleSize: number;
 }
 
+export interface WishView {
+  id: string;
+  text: string;
+  mode: CardMode;
+}
+
 export interface MissionView {
   id: string;
   text: string;
@@ -126,5 +132,7 @@ export interface AppState {
   cards: CardView[];
   // Principe only.
   mission: MissionView | null;
+  // Principe only: how many of her wishes fit the current mode. He never sees the list.
+  wishesToDraw: number;
   pushConfigured: boolean;
 }

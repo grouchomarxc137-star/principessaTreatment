@@ -1,8 +1,8 @@
 import type { CardMode, Mode, PreferenceKind } from "../../shared/types.ts";
 
 // Starting content. Cards and Do/Don't items are copied into the database the
-// first time the server starts, after which she can edit them. Missions stay
-// here and are drawn at random.
+// first time the server starts, after which she can edit them. There are no
+// built-in missions: his missions come only from her secret wishes.
 
 interface DefaultCard {
   title: string;
@@ -57,38 +57,11 @@ export const DEFAULT_PREFERENCES: { kind: PreferenceKind; text: string }[] = [
   { kind: "DONT", text: "Tease me" },
 ];
 
-export const MISSIONS: { text: string; mode: CardMode }[] = [
-  { text: "Tell her a memory you love.", mode: "ANY" },
-  { text: "Surprise her with something affectionate.", mode: "ANY" },
-  { text: "Tell her one thing she did recently that made you proud of her.", mode: "ANY" },
-
-  { text: "Send her a spontaneous selfie.", mode: "DISTANCE" },
-  { text: "Record a short voice message telling her something you love about her.", mode: "DISTANCE" },
-  { text: "Send her something that reminds you of her.", mode: "DISTANCE" },
-  { text: "Send her a photo of whatever you're looking at and tell her you wish she were there.", mode: "DISTANCE" },
-  { text: "Send her a song that makes you think of her, with one line about why.", mode: "DISTANCE" },
-  { text: "Call her for no reason at all.", mode: "DISTANCE" },
-  { text: "Send her a picture of the two of you and what you remember about that day.", mode: "DISTANCE" },
-  { text: "Tell her about a moment today when you thought of her.", mode: "DISTANCE" },
-
-  { text: "Bring her something small without being asked.", mode: "TOGETHER" },
-  { text: "Kiss her forehead and don't explain why.", mode: "TOGETHER" },
-  { text: "Make her a drink the way she likes it.", mode: "TOGETHER" },
-  { text: "Leave a note somewhere she'll find it later.", mode: "TOGETHER" },
-  { text: "Tell her one specific thing you love about how she looks today.", mode: "TOGETHER" },
-  { text: "Put on a song she loves and pull her into a slow dance.", mode: "TOGETHER" },
-  { text: "Take her hand the next time you're walking together.", mode: "TOGETHER" },
-];
-
-export function missionsFor(mode: Mode) {
-  return MISSIONS.filter((m) => m.mode === "ANY" || m.mode === mode);
-}
-
 // How long an open offer stays up before it quietly lapses.
 export const OFFER_HOURS = 12;
 // Do/Don't items switch themselves off after this long.
 export const PREFERENCE_HOURS = 24;
 // How long a finished request keeps asking "did it help?".
 export const AFTERCARE_DAYS = 3;
-// A new mystery mission avoids repeating any of the last few.
+// A newly drawn wish avoids repeating any of the last few.
 export const MISSIONS_TO_REMEMBER = 6;

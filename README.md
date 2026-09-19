@@ -91,7 +91,7 @@ Put the two printed keys in `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY`, set `VAP
 What sends a notification:
 
 - To him: SOS, a card, "I can't ask for it", "You decide", an offer taken.
-- To her: each of his answers, and when he finishes a mystery mission.
+- To her: each of his answers, and when he grants one of her secret wishes.
 
 ## Useful commands
 

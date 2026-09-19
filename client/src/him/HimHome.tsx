@@ -43,7 +43,7 @@ export function HimHome() {
           <div className="empty">
             <p className="voice">She hasn't asked for anything.</p>
             <p className="meta">
-              You could <Link to="/offer">put something on offer</Link> or <Link to="/mystery">draw a mystery mission</Link>.
+              You could <Link to="/offer">put something on offer</Link> or <Link to="/mystery">draw one of her secret wishes</Link>.
             </p>
           </div>
         )}
@@ -159,6 +159,22 @@ function RequestCard({ r, s }: { r: RequestView; s: AppState }) {
     </div>
   );
 
+  if (r.kind === "CANT_ASK" && !r.card) {
+    return (
+      <Card className="card--request card--sealed" aria-label="She can't ask for anything right now">
+        <span className="seal" aria-hidden="true">
+          <Mark />
+        </span>
+        <p className="sealed-text">She could use some extra love right now. Don't ask, just be sweet.</p>
+        <p className="card__note" style={{ marginTop: 10, maxWidth: "none" }}>
+          Sent quietly at {when(r.createdAt)}. No need to mention it.
+        </p>
+        {actions}
+      </Card>
+    );
+  }
+
+  // From before "I can't ask for it" became a quiet signal: those carried a card.
   if (r.kind === "CANT_ASK") {
     return (
       <Card className="card--request card--sealed" aria-label="A request she couldn't ask for herself">

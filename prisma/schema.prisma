@@ -98,7 +98,8 @@ model CareCard {
 // aftercare work the same for all of them.
 //
 //   CARD       picked from the Care Deck
-//   CANT_ASK   "I can't ask for it": the app asks on her behalf
+//   CANT_ASK   "I can't ask for it": a quiet signal, no card, no details
+//              (older ones carry a card, from when it went through the deck)
 //   HANDLE_ME  "Permission to handle me": he decides what care to give
 //   SOS        one button, no details
 //   OFFER      she claimed one of his open offers
@@ -251,12 +252,25 @@ enum MissionStatus {
   SKIPPED
 }
 
-// Secret until he's done it; then a MYSTERY request reveals it to her.
+// Her secret wishes: things she loves him doing, or wishes he would. He draws
+// one at random without seeing the list; she finds out which once he's done it.
+model Wish {
+  id        String           @id @default(cuid())
+  text      String
+  mode      CardMode         @default(ANY)
+  createdAt DateTime         @default(now())
+  missions  MysteryMission[]
+}
+
+// A wish he drew. Secret until he's done it; then a MYSTERY request reveals it
+// to her. Keeps its own copy of the text so removing the wish doesn't lose it.
 model MysteryMission {
   id        String        @id @default(cuid())
   text      String
   mode      Mode
   status    MissionStatus @default(ACTIVE)
+  wishId    String?
+  wish      Wish?         @relation(fields: [wishId], references: [id], onDelete: SetNull)
   createdAt DateTime      @default(now())
   closedAt  DateTime?
   reveal    CareRequest?

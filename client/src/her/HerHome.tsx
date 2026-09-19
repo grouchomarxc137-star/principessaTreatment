@@ -14,6 +14,7 @@ export function HerHome() {
 
   const sos = s.active.find((r) => r.kind === "SOS");
   const handedOver = s.active.find((r) => r.kind === "HANDLE_ME");
+  const signalled = s.active.find((r) => r.kind === "CANT_ASK" && !r.card);
   const pending = s.aftercarePending[0];
 
   const sendSos = () => {
@@ -23,6 +24,9 @@ export function HerHome() {
 
   const handOver = () =>
     act(() => api.post("/handle-me")).then((r) => r && say("Handed over. He'll decide."));
+
+  const signal = () =>
+    act(() => api.post("/quiet")).then((r) => r && say("Sent quietly. He'll just be your Principe."));
 
   return (
     <main className="app">
@@ -59,10 +63,10 @@ export function HerHome() {
             <span className="voice">You decide</span>
             <span className="meta">{handedOver ? "Handed to him" : "He chooses the care"}</span>
           </button>
-          <Link to="/deck?for=me" className="ask-tile">
+          <button type="button" className="ask-tile" onClick={signal} disabled={Boolean(signalled)}>
             <span className="voice">I can't ask for it</span>
-            <span className="meta">The app asks him for you</span>
-          </Link>
+            <span className="meta">{signalled ? "He knows" : "He'll just be your Principe"}</span>
+          </button>
         </nav>
       </div>
 
@@ -81,7 +85,8 @@ export function HerHome() {
 function HerTicket({ r }: { r: RequestView }) {
   const { act } = useStore();
   const status = r.response ? RESPONSE_SEEN[r.response.kind] : "Sent to him.";
-  const how = r.kind === "CANT_ASK" ? "Asked for you" : r.kind === "OFFER" ? "You took his offer" : "Asked";
+  const how =
+    r.kind === "CANT_ASK" ? (r.card ? "Asked for you" : "Sent quietly") : r.kind === "OFFER" ? "You took his offer" : "Asked";
 
   return (
     <article className="ticket">
@@ -125,9 +130,9 @@ export function AftercarePrompt({ r, onDone }: { r: RequestView; onDone?: () => 
     <section className={`ticket ${mystery ? "ticket--reveal" : ""}`} aria-label="Did it help?">
       {mystery ? (
         <>
-          <h2 className="voice subheading">That was a secret mission</h2>
+          <h2 className="voice subheading">He granted one of your wishes</h2>
           <p className="reveal-text">“{r.missionText}”</p>
-          <p className="meta">The app gave it to him, {when(r.createdAt)}. Did it help? He'll see your answer.</p>
+          <p className="meta">He drew it in secret and did it, {when(r.createdAt)}. Did it help? He'll see your answer.</p>
         </>
       ) : (
         <>

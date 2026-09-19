@@ -8,7 +8,7 @@ import { broadcastChange } from "../realtime.ts";
 import { requestInclude, toCardView, toRequestView } from "../state.ts";
 
 // Things only she can change: how she's feeling, how she wants to be treated,
-// her deck, and what she's learned helps.
+// her deck, her secret wishes, and what she's learned helps.
 
 export const principessaRoutes = Router();
 
@@ -79,7 +79,8 @@ principessaRoutes.get("/cards", async (_req, res) => {
 
 const CardBody = z.object({
   title: z.string().trim().min(1).max(60),
-  forHim: z.string().trim().min(1).max(80),
+  // Only older "I can't ask for it" requests read this; new cards reuse the title.
+  forHim: z.string().trim().min(1).max(80).optional(),
   mode: z.enum(CARD_MODES),
 });
 
@@ -87,7 +88,7 @@ principessaRoutes.post("/cards", async (req, res) => {
   const data = parse(CardBody, req.body);
   const last = await prisma.careCard.findFirst({ orderBy: { sortOrder: "desc" } });
   const card = await prisma.careCard.create({
-    data: { ...data, isCustom: true, sortOrder: (last?.sortOrder ?? 0) + 10 },
+    data: { ...data, forHim: data.forHim ?? data.title, isCustom: true, sortOrder: (last?.sortOrder ?? 0) + 10 },
   });
   broadcastChange();
   res.status(201).json(toCardView(card));
@@ -98,6 +99,28 @@ principessaRoutes.patch("/cards/:id", async (req, res) => {
   const card = await prisma.careCard.update({ where: { id: req.params.id }, data });
   broadcastChange();
   res.json(toCardView(card));
+});
+
+// --- Secret wishes -------------------------------------------------------------------
+
+principessaRoutes.get("/wishes", async (_req, res) => {
+  const wishes = await prisma.wish.findMany({ orderBy: { createdAt: "desc" } });
+  res.json(wishes.map((w) => ({ id: w.id, text: w.text, mode: w.mode })));
+});
+
+const WishBody = z.object({ text: z.string().trim().min(1).max(120), mode: z.enum(CARD_MODES) });
+
+principessaRoutes.post("/wishes", async (req, res) => {
+  const wish = await prisma.wish.create({ data: parse(WishBody, req.body) });
+  broadcastChange();
+  res.status(201).json({ id: wish.id, text: wish.text, mode: wish.mode });
+});
+
+// A mission he already drew keeps its own copy of the text.
+principessaRoutes.delete("/wishes/:id", async (req, res) => {
+  await prisma.wish.deleteMany({ where: { id: req.params.id } });
+  broadcastChange();
+  res.json({ ok: true });
 });
 
 // --- Discoveries ------------------------------------------------------------------

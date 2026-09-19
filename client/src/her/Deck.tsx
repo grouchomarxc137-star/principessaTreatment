@@ -5,6 +5,7 @@ import { FEELING } from "../copy.ts";
 import { useRouter } from "../router.tsx";
 import { useAppState, useStore } from "../store.tsx";
 import { Card, CardTitle } from "../ui/Card.tsx";
+import { BackBar } from "../ui/Chrome.tsx";
 
 interface DeckCard extends CardView {
   note: string | null;
@@ -31,8 +32,7 @@ function deckFor(s: AppState): DeckCard[] {
 export function Deck() {
   const s = useAppState();
   const { act, say } = useStore();
-  const { query, navigate } = useRouter();
-  const forMe = query.get("for") === "me";
+  const { navigate } = useRouter();
   const cards = useMemo(() => deckFor(s), [s]);
   const [index, setIndex] = useState(0);
   const [sending, setSending] = useState<string | null>(null);
@@ -69,37 +69,24 @@ export function Deck() {
   const ask = async () => {
     if (!card || sending) return;
     setSending(card.id);
-    const done = await act(() => api.post("/requests", { cardId: card.id, onMyBehalf: forMe }));
+    const done = await act(() => api.post("/requests", { cardId: card.id }));
     if (!done) {
       setSending(null);
       return;
     }
     window.setTimeout(
       () => {
-        say(forMe ? "Asked for you. He'll see it." : "Sent. He'll see it.");
+        say("Sent. He'll see it.");
         navigate("/");
       },
       window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 480,
     );
   };
 
-  const setForMe = (on: boolean) => navigate(on ? "/deck?for=me" : "/deck", { replace: true });
-
   return (
     <main className="app deck-screen">
-      <header className="topbar">
-        <p className="meta">{s.mode === "TOGETHER" ? "For when you're together" : "For when you're apart"}</p>
-        <div className="segmented" role="group" aria-label="Who asks">
-          <button type="button" aria-pressed={!forMe} onClick={() => setForMe(false)}>
-            I'll ask
-          </button>
-          <button type="button" aria-pressed={forMe} onClick={() => setForMe(true)}>
-            Ask for me
-          </button>
-        </div>
-      </header>
-
-      {forMe && <p className="lede">Pick what you'd like. The app asks him for you, so you don't have to.</p>}
+      <BackBar to="/" label="Home" />
+      <p className="meta">{s.mode === "TOGETHER" ? "For when you're together" : "For when you're apart"}</p>
 
       <div className="deck-body">
         <div
@@ -132,7 +119,7 @@ export function Deck() {
         </div>
 
         <button type="button" className="btn btn--block btn--primary" onClick={ask} disabled={!card || Boolean(sending)}>
-          {forMe ? "Ask him for me" : "Ask for this"}
+          Ask for this
         </button>
       </div>
     </main>
