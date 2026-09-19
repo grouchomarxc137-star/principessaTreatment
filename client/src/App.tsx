@@ -9,9 +9,9 @@ import { Mark } from "./ui/Mark.tsx";
 
 export type Side = "her" | "him";
 
-const THEME_COLOR = { her: "#fdf4e3", him: "#e6efee", sos: "#9c4166" };
+const THEME_COLOR = { her: "#fdf4e3", him: "#fdf4e3", sos: "#e9b40f" };
 
-// Her side is cream, his is pale sky, and his turns raspberry while she's
+// Both sides are cream, and his turns gold while she's
 // waiting on an SOS. Set on <html> so the whole page follows.
 export function useSide(side: Side, alert = false) {
   useEffect(() => {
@@ -49,7 +49,7 @@ export function App() {
 function Signed({ me }: { me: Me }) {
   const { state, error, refresh } = useStore();
   const side: Side = me.role === "PRINCIPESSA" ? "her" : "him";
-  // His screen turns raspberry from the moment she presses SOS until he answers it.
+  // His screen turns gold from the moment she presses SOS until he answers it.
   const waitingSos = side === "him" && Boolean(state?.active.some((r) => r.kind === "SOS" && !r.response));
   useSide(side, waitingSos);
 

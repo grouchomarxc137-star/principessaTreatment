@@ -85,32 +85,31 @@ Everything else is layered on the same loop: SOS, "You decide" (handle me), "I c
 
 ### Where it comes from
 
-A sister app to **Lovissimi**. It uses the same materials: warm cream paper, brown ink that outlines everything like a sticker, solid drop shadows instead of blur, honey for the main action, and each person's cape colour from Lovissimi (her raspberry, his slate blue). What stays specific to this app is the idea of a deck of cards made for one person. Her care comes as cards with a mark in each corner, the second one upside down like a real playing card. His missions are drawn face down, and "I can't ask for it" arrives as a sealed note.
+A sister app to **Lovissimi**. It uses the same materials: warm cream paper, brown ink that outlines everything like a sticker, solid drop shadows instead of blur, and a colour for each person (her gold, his warm orange) on the buttons, chips and selected tabs of their side. What stays specific to this app is the idea of a deck of cards made for one person. Her care comes as cards with a mark in each corner, the second one upside down like a real playing card. His missions are drawn face down, and "I can't ask for it" arrives as a sealed note.
 
 ### Tokens
 
 | Name | Hex | Use |
 | --- | --- | --- |
-| Crema | `#FDF4E3` | Her side's background |
-| Cielo | `#E6EFEE` | His side's background, a pale sky |
+| Crema | `#FDF4E3` | Background on both sides |
 | Carta | `#FFF8EA` | Cards and surfaces |
 | Inchiostro | `#4A3428` | Text, outlines, drop shadows |
-| Miele (honey) | `#F2B02E` | Main actions, the active tab |
-| Lampone (raspberry) | `#B3577A`, strong `#9C4166` | Her voice on cards; SOS; his whole screen during SOS |
-| Ardesia (slate) | `#3F5A7A` | His voice: offers, revealed missions |
+| Miele (honey) | `#F2B02E` | The tiara on the heart |
+| Oro (gold) | `#F5C21B`, strong `#E9B40F`, text `#8C6200` | Her buttons, chips and active tab; her voice on cards; SOS; his whole screen during SOS |
+| Arancio (warm orange) | `#EF8636`, text `#A44810` | His buttons, chips and active tab; his voice: offers, revealed missions |
 
 - **Type.** Baloo 2 (heavy) for headlines and everything in her voice; Nunito for interface text. Both are Lovissimi's typefaces, self-hosted. Sentence case throughout.
-- **Shapes.** Cards: 22px corners, 2px brown outline, 4px solid shadow. Main buttons: honey, outlined, sitting on a 3px shadow that disappears when pressed. Tickets, chips and inputs: flat, with soft outlines. That keeps the cards and main actions on top of the hierarchy.
+- **Shapes.** Cards: 22px corners, 2px brown outline, 4px solid shadow. Main buttons: the person's colour, outlined, sitting on a 3px shadow that disappears when pressed. Tickets, chips and inputs: flat, with soft outlines. That keeps the cards and main actions on top of the hierarchy.
 - **Layout.** A single left-aligned phone column. The top answers "how is she"; actions sit low, in thumb reach.
 
 ### The mark
 
-A raspberry heart wearing a honey tiara, outlined in brown: the sister of Lovissimi's crowned heart. It's the corner index on every card (and upside down in the opposite corner), the wax seal on "I can't ask for it", the medallion on the card back, and the app icon.
+A gold heart wearing a honey tiara, outlined in brown: the sister of Lovissimi's crowned heart. It's the corner index on every card (and upside down in the opposite corner), the wax seal on "I can't ask for it", the medallion on the card back, and the app icon.
 
 ### Principles
 
-1. **Her words are the interface.** Card titles are first-person and set large. Raspberry is her voice; slate blue is his.
-2. **Colour is state on his side.** Pale sky means calm. Raspberry means she's waiting on an SOS, with a slow breathing pulse that's switched off under reduced motion.
+1. **Her words are the interface.** Card titles are first-person and set large. Gold is her voice; orange is his.
+2. **Colour is state on his side.** Cream means calm. Gold means she's waiting on an SOS, with a slow breathing pulse that's switched off under reduced motion.
 3. **Nothing counts him.** Her "did it help?" answers are visible to him one at a time in History. There are no totals, scores, streaks or reminders.
 
 ### History

@@ -4,7 +4,7 @@ import { Link, useRouter } from "../router.tsx";
 import { useAppState, useStore } from "../store.tsx";
 import { Card, CardTitle } from "../ui/Card.tsx";
 
-// What he's put on offer. His voice, so slate blue rather than raspberry.
+// What he's put on offer. His voice, so orange rather than gold.
 export function HerOffers() {
   const s = useAppState();
   const { act, say } = useStore();

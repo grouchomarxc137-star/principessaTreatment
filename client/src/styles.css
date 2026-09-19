@@ -3,10 +3,12 @@
 
 /* ---------------------------------------------------------------------------
    Tokens. Lovissimi's family: warm cream paper, brown ink that outlines
-   everything like a sticker, honey for the main action. Principessa's colour
-   is her raspberry cape; Principe's is his slate-blue cape. Her side sits on
-   cream, his on a pale sky, and when she asks for help his screen turns
-   raspberry.
+   everything like a sticker, honey for her tiara. Principessa's colour
+   is gold; Principe's is warm orange. Both sides sit on the same cream; each
+   person's colour lives in the buttons, chips and selected tabs (--accent).
+   When she asks for help his screen turns gold. Both colours are too light to
+   read as text on paper, so each has a deeper "-text" shade, and anything
+   filled with them takes brown ink.
    ------------------------------------------------------------------------- */
 
 :root {
@@ -17,13 +19,12 @@
   --inchiostro: #4a3428;
   --inchiostro-soft: #7a6454;
   --miele: #f2b02e;
-  --miele-strong: #d99615;
-  --miele-ink: #5b4620;
-  --lampone: #b3577a;
-  --lampone-strong: #9c4166;
-  --lampone-deep: #86365a;
-  --ardesia: #3f5a7a;
-  --cielo: #e6efee;
+  --oro: #f5c21b;
+  --oro-strong: #e9b40f;
+  --oro-deep: #d9a300;
+  --oro-text: #8c6200;
+  --arancio: #ef8636;
+  --arancio-text: #a44810;
 
   --display: "Baloo 2 Variable", "Baloo 2", "Arial Rounded MT Bold", system-ui, sans-serif;
   --ui: "Nunito Variable", Nunito, system-ui, sans-serif;
@@ -56,23 +57,25 @@
   --ink: var(--inchiostro);
   --ink-soft: var(--inchiostro-soft);
   --line: var(--riga);
-  --focus: var(--lampone-strong);
+  --focus: var(--oro-text);
+  --accent: var(--oro);
 }
 
 [data-side="him"] {
-  --bg: var(--cielo);
+  --bg: var(--crema);
   --ink: var(--inchiostro);
   --ink-soft: var(--inchiostro-soft);
-  --line: #c9d6d2;
-  --focus: var(--ardesia);
+  --line: var(--riga);
+  --focus: var(--arancio-text);
+  --accent: var(--arancio);
 }
 
 [data-alert="sos"] {
-  --bg: var(--lampone-strong);
-  --ink: var(--carta);
-  --ink-soft: rgb(255 248 234 / 0.88);
-  --line: rgb(255 248 234 / 0.4);
-  --focus: var(--carta);
+  --bg: var(--oro-strong);
+  --ink: var(--inchiostro);
+  --ink-soft: rgb(74 52 40 / 0.85);
+  --line: rgb(74 52 40 / 0.35);
+  --focus: var(--inchiostro);
 }
 
 /* --- Base -------------------------------------------------------------- */
@@ -253,11 +256,11 @@ a {
   width: 100%;
 }
 
-/* The main action: honey, outlined, sitting on its shadow until pressed. */
+/* The main action: the person's colour, outlined, sitting on its shadow until pressed. */
 .btn--primary {
-  background: var(--miele);
+  background: var(--accent, var(--oro));
   border: var(--outline);
-  color: var(--miele-ink);
+  color: var(--inchiostro);
   box-shadow: var(--lift-small);
 }
 
@@ -269,7 +272,7 @@ a {
 .btn--pearl {
   background: var(--carta);
   border: var(--outline);
-  color: var(--lampone-strong);
+  color: var(--oro-text);
   box-shadow: var(--lift-small);
 }
 
@@ -333,9 +336,9 @@ a {
 }
 
 .chip[aria-pressed="true"] {
-  background: var(--miele);
+  background: var(--accent, var(--oro));
   border-color: var(--inchiostro);
-  color: var(--miele-ink);
+  color: var(--inchiostro);
 }
 
 .segmented {
@@ -372,7 +375,7 @@ a {
   border-radius: 22px;
   border: var(--outline);
   background: var(--carta);
-  color: var(--lampone);
+  color: var(--oro-text);
   box-shadow: var(--lift);
   padding: 54px 22px 50px;
 }
@@ -411,9 +414,9 @@ a {
   font-size: var(--t-38);
 }
 
-/* His voice on a card is slate blue, not raspberry. */
+/* His voice on a card is orange, not gold. */
 .card--his {
-  color: var(--ardesia);
+  color: var(--arancio-text);
 }
 
 .card__note {
@@ -478,7 +481,7 @@ a {
   margin-left: -23px;
   border-radius: 50%;
   border: var(--outline);
-  background: var(--miele);
+  background: var(--carta);
   display: grid;
   place-items: center;
   box-shadow: var(--lift-small);
@@ -498,18 +501,18 @@ a {
   text-wrap: pretty;
 }
 
-/* Card back: raspberry, a fine cream lattice, a cream border inset like a
+/* Card back: gold, a fine cream lattice, a cream border inset like a
    real deck, and the mark on a medallion. */
 .card-back {
   position: absolute;
   inset: 0;
   border-radius: 22px;
   border: var(--outline);
-  background-color: var(--lampone);
+  background-color: var(--oro);
   background-image:
     repeating-linear-gradient(45deg, rgb(255 248 234 / 0.2) 0 1.5px, transparent 1.5px 12px),
     repeating-linear-gradient(-45deg, rgb(255 248 234 / 0.2) 0 1.5px, transparent 1.5px 12px);
-  box-shadow: var(--lift), inset 0 0 0 10px var(--lampone), inset 0 0 0 12px var(--carta);
+  box-shadow: var(--lift), inset 0 0 0 10px var(--oro), inset 0 0 0 12px var(--carta);
 }
 
 .card-back__mark {
@@ -523,7 +526,7 @@ a {
   border-radius: 50%;
   border: var(--outline);
   background: var(--carta);
-  box-shadow: 0 0 0 7px var(--lampone);
+  box-shadow: 0 0 0 7px var(--oro);
 }
 
 /* --- Deck ---------------------------------------------------------------------- */
@@ -612,9 +615,9 @@ a {
 
 /* "You decide" once handed over: shown as switched on. */
 .ask-tile:disabled {
-  background: var(--miele);
+  background: var(--accent, var(--oro));
   border: var(--outline);
-  color: var(--miele-ink);
+  color: var(--inchiostro);
   cursor: default;
 }
 
@@ -641,8 +644,8 @@ a {
   justify-content: center;
   border: var(--outline);
   border-radius: 20px;
-  background: var(--lampone-strong);
-  color: var(--carta);
+  background: var(--oro);
+  color: var(--inchiostro);
   font-family: var(--display);
   font-weight: 800;
   font-size: var(--t-30);
@@ -674,11 +677,11 @@ a {
   font-weight: 800;
   font-size: var(--t-24);
   line-height: 1.1;
-  color: var(--lampone);
+  color: var(--oro-text);
 }
 
 .ticket__title--his {
-  color: var(--ardesia);
+  color: var(--arancio-text);
 }
 
 .ticket__status {
@@ -709,7 +712,7 @@ a {
   font-weight: 700;
   font-size: var(--t-21);
   line-height: 1.2;
-  color: var(--ardesia);
+  color: var(--arancio-text);
 }
 
 .treat-summary {
@@ -750,7 +753,7 @@ a {
 
 @keyframes breathe {
   50% {
-    background-color: var(--lampone-deep);
+    background-color: var(--oro-deep);
   }
 }
 
@@ -778,7 +781,7 @@ a {
   border-radius: 14px;
   border: 2px solid var(--riga);
   background: var(--carta-alt);
-  color: var(--lampone);
+  color: var(--oro-text);
   font-family: var(--display);
   font-weight: 800;
   font-size: var(--t-18);
@@ -787,9 +790,9 @@ a {
 }
 
 .idea[aria-pressed="true"] {
-  background: var(--lampone);
+  background: var(--oro);
   border-color: var(--inchiostro);
-  color: var(--carta);
+  color: var(--inchiostro);
 }
 
 .idea small {
@@ -821,7 +824,7 @@ a {
   font-family: var(--display);
   font-weight: 800;
   font-size: var(--t-18);
-  color: var(--ardesia);
+  color: var(--arancio-text);
 }
 
 .treat-list dd {
@@ -940,7 +943,7 @@ a {
 }
 
 .discovery .voice {
-  color: var(--lampone);
+  color: var(--oro-text);
 }
 
 .empty {
@@ -999,9 +1002,9 @@ a {
 }
 
 .tabbar a[aria-current="page"] {
-  background: var(--miele);
+  background: var(--accent, var(--oro));
   border-color: var(--inchiostro);
-  color: var(--miele-ink);
+  color: var(--inchiostro);
 }
 
 .tabbar .dot {
@@ -1012,7 +1015,7 @@ a {
   height: 10px;
   border-radius: 50%;
   border: 1.5px solid var(--inchiostro);
-  background: var(--lampone);
+  background: var(--oro);
 }
 
 /* --- Sheet, toast ---------------------------------------------------------------------- */
@@ -1066,7 +1069,7 @@ a {
 }
 
 .feeling-options button[aria-pressed="true"] {
-  color: var(--lampone);
+  color: var(--oro-text);
 }
 
 .toast {
@@ -1162,22 +1165,22 @@ a {
 /* Each picks their own cape colour. */
 .who button[aria-pressed="true"] {
   border: var(--outline);
-  color: var(--carta);
-  background: var(--lampone);
+  color: var(--inchiostro);
+  background: var(--oro);
   box-shadow: var(--lift-small);
 }
 
 .who button:last-child[aria-pressed="true"] {
-  background: var(--ardesia);
+  background: var(--arancio);
 }
 
 .error {
-  color: var(--lampone-strong);
+  color: var(--oro-text);
   font-weight: 800;
 }
 
 [data-alert="sos"] .error {
-  color: var(--carta);
+  color: var(--inchiostro);
 }
 
 /* --- Motion preferences ---------------------------------------------------------------- */
