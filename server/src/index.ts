@@ -112,7 +112,9 @@ for (let attempt = 1; ; attempt++) {
     break;
   } catch (error) {
     if (attempt === 30) {
-      console.error("Couldn't reach the database. Is it running? Locally, `npm run dev` starts it.");
+      console.error(
+        "Couldn't start: the database isn't reachable or its tables are missing. Locally, `npm run dev` starts it and applies migrations.",
+      );
       throw error;
     }
     if (attempt === 1) console.log("Waiting for the database…");

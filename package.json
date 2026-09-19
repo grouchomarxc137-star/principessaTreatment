@@ -14,6 +14,7 @@
     "dotenv": "18.0.0",
     "express": "5.2.1",
     "pg": "8.23.0",
+    "prisma": "7.10.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "web-push": "3.6.7",
@@ -30,7 +31,6 @@
     "concurrently": "10.0.5",
     "embedded-postgres": "18.4.0-beta.17",
     "esbuild": "0.28.2",
-    "prisma": "7.10.0",
     "tsx": "4.23.13",
     "typescript": "7.0.2",
     "vite": "8.3.0"
@@ -44,7 +44,7 @@
     "generate": "prisma generate",
     "typecheck": "tsc -p server && tsc -p client",
     "build": "prisma generate && vite build --config client/vite.config.ts && esbuild server/src/index.ts --bundle --platform=node --format=esm --target=node22 --packages=external --outfile=server/dist/index.js",
-    "start": "node server/dist/index.js",
+    "start": "prisma migrate deploy && node server/dist/index.js",
     "vapid": "web-push generate-vapid-keys",
     "migrate:deploy": "prisma migrate deploy",
     "postinstall": "prisma generate"

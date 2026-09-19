@@ -69,7 +69,7 @@ To try both sides at once, use a second browser or a private window for the othe
    - `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` for notifications (see below)
 5. Generate a public domain for the service under Settings → Networking.
 
-`railway.json` already tells Railway how to build (`npm run build`), to run database migrations before each deploy, to start with `npm start`, and to health-check `/api/health`.
+`railway.json` already tells Railway how to build (`npm run build`), to start with `npm start` (which first creates or updates the database tables), and to health-check `/api/health`.
 
 On first start the server creates both accounts from the password variables and fills in the starting deck and Do/Don't list. Changing a password variable and redeploying updates that password and signs that person out on every device.
 
